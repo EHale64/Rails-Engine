@@ -9,7 +9,6 @@ RSpec.describe 'Merchants API' do
     merchant =  JSON.parse(response.body, symbolize_names: true)
 
     expect(response).to be_successful
-
     expect(merchant[:data][:attributes]).to have_key(:id)
     expect(merchant[:data][:attributes][:id]).to eq(id)
 
@@ -41,11 +40,9 @@ RSpec.describe 'Merchants API' do
   end
 
   it "can create a merchant" do
-    merchant_params = ({ name: 'John Smith'
-                      })
-    headers = {"CONTENT_TYPE" => "application/json"}
+    merchant_params = ({ name: 'John Smith' })
 
-    post "/api/v1/merchants", headers: headers, params: JSON.generate(merchant: merchant_params)
+    post "/api/v1/merchants", params: merchant_params
     new_merchant = Merchant.last
 
     expect(response).to be_successful
@@ -56,9 +53,8 @@ RSpec.describe 'Merchants API' do
     id = create(:merchant).id
     previous_name = Merchant.last.name
     merchant_params = { name: 'Jane Smith' }
-    headers = {"CONTENT_TYPE" => "application/json"}
 
-    patch "/api/v1/merchants/#{id}", headers: headers, params: JSON.generate({merchant: merchant_params})
+    patch "/api/v1/merchants/#{id}", params: merchant_params
     merchant = Merchant.find_by(id: id)
 
     expect(response).to be_successful
