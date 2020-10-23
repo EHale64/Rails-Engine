@@ -3,11 +3,9 @@ require 'rails_helper'
 RSpec.describe 'Merchants API' do
   it "can get one Merchant by it's id" do
     id = create(:merchant).id
-
     get "/api/v1/merchants/#{id}"
 
     merchant =  JSON.parse(response.body, symbolize_names: true)
-
     expect(response).to be_successful
     expect(merchant[:data][:attributes]).to have_key(:id)
     expect(merchant[:data][:attributes][:id]).to eq(id)
@@ -72,5 +70,19 @@ RSpec.describe 'Merchants API' do
     expect(response).to be_successful
     expect(Merchant.count).to eq(0)
     expect{Merchant.find(merchant.id)}.to raise_error(ActiveRecord::RecordNotFound)
+  end
+
+  it "can get all items for a merchant" do
+    merchant = create(:merchant)
+    3.times { create(:item, merchant_id: merchant.id)}
+    rand_items = create_list(:item, 2)
+
+    get "/api/v1/merchants/#{merchant.id}/items"
+    items = JSON.parse(response.body, symbolize_names: true)
+
+    expect(Item.all.count).to eq(5)
+    expect(items[:data][:relationships][:items][:data].count).to eq(3)
+    expect(items[:data][:relationships][:items][:data].first).to have_key(:id)
+    expect(items[:data][:relationships][:items][:data].first[:id]).to be_an(Integer)
   end
 end
